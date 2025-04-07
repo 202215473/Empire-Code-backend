@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema_field 
 from rest_framework import serializers 
 from django.utils import timezone
-from .models import Category, Auction 
+from .models import Category, Auction, Bid
 
 class CategoryListCreateSerializer(serializers.ModelSerializer): 
     class Meta: 
@@ -50,3 +50,13 @@ class AuctionDetailSerializer(serializers.ModelSerializer):
         if value <= timezone.now(): 
             raise serializers.ValidationError("Closing date must be greater than now, you idiot.") 
         return value 
+    
+class BidListCreateSerializer(serializers.ModelSerializer): 
+    class Meta: 
+        model = Bid 
+        fields = '__all__' 
+
+class BidDetailSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = Bid 
+        fields = '__all__' 
