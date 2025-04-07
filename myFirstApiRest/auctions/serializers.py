@@ -28,7 +28,7 @@ class AuctionListCreateSerializer(serializers.ModelSerializer):
     def get_isOpen(self, obj): 
         return obj.closing_date > timezone.now() 
     
-    def validate_closing_date(self, obj, value): 
+    def validate_closing_date(self, value): 
         if value < timezone.now() + timedelta(days=15): 
             raise serializers.ValidationError("La fecha de cierre debe ser al mneos 15 días después de la fecha de creación") 
         return value 
