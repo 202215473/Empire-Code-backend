@@ -137,7 +137,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = { 
     'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination', 
-    'PAGE_SIZE': 5,  # Número de elementos que aparecen en la web
+    'PAGE_SIZE': 8,  # Número de elementos que aparecen en la web
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 } 
 

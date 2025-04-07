@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db.models import Q 
 
 # Create your views here.
 from rest_framework import generics 
@@ -16,6 +17,28 @@ class CategoryRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 class AuctionListCreate(generics.ListCreateAPIView): 
     queryset = Auction.objects.all() 
     serializer_class = AuctionListCreateSerializer 
+
+    def get_queryset(self): 
+        queryset = Auction.objects.all() 
+        params = self.request.query_params 
+
+        search = params.get('text', None) 
+        if search: 
+            queryset = queryset.filter(Q(title__icontains=search) | Q(description__icontains=search)) 
+        
+        category = params.get('category', None)
+        if category:
+            queryset = queryset.filter(Q(category__icontains=category))
+
+        price_min = params.get('priceMin', None)
+        if price_min:
+            queryset = queryset.filter(price__gte=price_min)
+
+        price_max = params.get('priceMax', None)
+        if price_max:
+            queryset = queryset.filter(price__lte=price_max)
+
+        return queryset 
 
 class AuctionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView): 
     queryset = Auction.objects.all() 
