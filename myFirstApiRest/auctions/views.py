@@ -28,7 +28,11 @@ class AuctionListCreate(generics.ListCreateAPIView):
         
         category = params.get('category', None)
         if category:
-            queryset = queryset.filter(Q(category__icontains=category))
+            if len(category) == 1:
+                queryset = queryset.filter(Q(category__id__icontains=category))
+            else:
+                category_list = category.split(',')
+                queryset = queryset.filter(category__id__in=category_list)
 
         price_min = params.get('priceMin', None)
         if price_min:
