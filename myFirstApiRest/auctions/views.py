@@ -2,7 +2,8 @@ from django.shortcuts import render
 from django.db.models import Q 
 
 # Create your views here.
-from rest_framework import generics 
+from rest_framework import generics, status
+from rest_framework.exceptions import ValidationError
 from .models import Category, Auction, Bid
 from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer , BidListCreateSerializer, BidDetailSerializer
 
@@ -24,6 +25,11 @@ class AuctionListCreate(generics.ListCreateAPIView):
 
         search = params.get('text', None) 
         if search: 
+            """if len(search) < 3:
+                raise ValidationError( 
+                    {"search": "La búsqueda debe tener al menos 3 caracteres."}, 
+                    code=status.HTTP_400_BAD_REQUEST 
+                )"""
             queryset = queryset.filter(Q(title__icontains=search) | Q(description__icontains=search)) 
         
         category = params.get('category', None)
