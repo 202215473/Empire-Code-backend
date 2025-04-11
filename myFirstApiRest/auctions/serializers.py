@@ -2,6 +2,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers 
 from datetime import timedelta
 from django.utils import timezone
+from django.db.models import Max
 from .models import Category, Auction, Bid
 
 class CategoryListCreateSerializer(serializers.ModelSerializer): 
@@ -55,6 +56,27 @@ class BidListCreateSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Bid 
         fields = '__all__' 
+    
+    # def validate_auction(self, obj):
+    #     isOpen = obj.auction.get_isOpen()
+    
+    # def validate_bid(self, obj):
+    #     new_bid = obj.bid
+    #     max_bid = Bid.objects.aggregate(Max("bid", default=1))
+        
+    #     if new_bid <= max_bid:
+    #         raise serializers.ValidationError(f"La puja debe ser mayor que la puja máxima actual de {max_bid} $")
+        
+    #     return obj
+    
+    # def validate_bid(self, value):
+    #     max_bid = Bid.objects.aggregate(Max("bid", default=1))
+        
+    #     if value <= max_bid:
+    #         raise serializers.ValidationError(f"La puja debe ser mayor que la puja máxima actual de {max_bid} $")
+        
+    #     return value
+
 
 class BidDetailSerializer(serializers.ModelSerializer):
     class Meta: 

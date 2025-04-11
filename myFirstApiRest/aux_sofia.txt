@@ -1,0 +1,12 @@
+USUARIO REGISTRADO
+{
+    "username": "sofia",
+    "first_name": "Sofia",
+    "last_name": "Negueruela",
+    "email": "sofia@gmail.com",
+    "birth_date": "1996-12-12",
+    "municipality": "",
+    "locality": "",
+    "password":"Sofia1234"
+} -> id: 3
+

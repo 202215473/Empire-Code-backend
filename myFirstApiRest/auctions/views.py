@@ -56,7 +56,7 @@ class AuctionListCreate(generics.ListCreateAPIView):
         return queryset 
 
 class AuctionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView): 
-    permission_classes = [IsOwnerOrAdmin] 
+    permission_classes = [IsOwnerOrAdmin]
     queryset = Auction.objects.all() 
     serializer_class = AuctionDetailSerializer
 

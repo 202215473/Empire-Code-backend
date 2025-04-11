@@ -40,12 +40,12 @@ class Auction(models.Model):
 
 class Bid(models.Model):
     auction = models.ForeignKey(Auction, related_name='bids', on_delete=models.CASCADE) 
-    bid = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('1.00'))]) 
+    bid = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('1.00'))])  # precio de la puja
     creation_date = models.DateTimeField(auto_now_add=True)
     username = models.CharField(max_length=150)
  
     class Meta:  
-        ordering=('auction', 'bid')  
+        ordering=('auction', 'bid')  # id compuesto
  
     def __str__(self): 
         return f"Bid of auction {self.auction} for {self.bid}$"
