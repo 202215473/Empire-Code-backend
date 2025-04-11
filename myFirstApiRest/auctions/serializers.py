@@ -23,6 +23,11 @@ class AuctionListCreateSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Auction 
         fields = '__all__' 
+        read_only_fields = ['auctioneer', 'creation_date']
+
+    def create(self, validated_data):
+        validated_data['auctioneer'] = self.context['request'].user
+        return super().create(validated_data)
  
     @extend_schema_field(serializers.BooleanField())
     def get_isOpen(self, obj): 
@@ -48,7 +53,7 @@ class AuctionDetailSerializer(serializers.ModelSerializer):
 
     def validate_closing_date(self, obj, value): 
         if value < obj.creation_date + timedelta(days=15): 
-            raise serializers.ValidationError("La fecha de cierre debe ser al mneos 15 días después de la fecha de creación") 
+            raise serializers.ValidationError("La fecha de cierre debe ser al menos 15 días después de la fecha de creación") 
         return value 
     
 class BidListCreateSerializer(serializers.ModelSerializer): 

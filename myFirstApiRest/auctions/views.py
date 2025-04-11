@@ -6,7 +6,7 @@ from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated 
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Category, Auction, Bid
 from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer , BidListCreateSerializer, BidDetailSerializer
@@ -22,7 +22,12 @@ class CategoryRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 
 class AuctionListCreate(generics.ListCreateAPIView): 
     queryset = Auction.objects.all() 
-    serializer_class = AuctionListCreateSerializer 
+    serializer_class = AuctionListCreateSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return [AllowAny()]
 
     def get_queryset(self): 
         queryset = Auction.objects.all() 
