@@ -54,7 +54,17 @@ class BidListCreateSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Bid 
         fields = '__all__' 
-    
+
+    def create(self, validated_data):
+        auction = validated_data['auction']
+        bid_price = validated_data['bid']
+        bid = Bid.objects.create(**validated_data)  # le pasa key=value de cada elemento de validated_data (que es un dict)
+        if bid_price > auction.price:  # se debería cumplir siempre
+            auction.price = bid_price
+            auction.save()  # Guardamos los cambios en la subasta
+        else:
+            print(f"no se ha guardado la subasta porque {bid_price} !> {auction.price}")
+        return bid
     # def validate_auction(self, obj):
     #     isOpen = obj.auction.get_isOpen()
     
