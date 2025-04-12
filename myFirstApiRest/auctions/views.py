@@ -1,12 +1,13 @@
 from django.shortcuts import render
-from django.db.models import Q 
+from django.db.models import Q, Max
+from django.utils import timezone
 
 # Create your views here.
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated 
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from .models import Category, Auction, Bid
 from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer , BidListCreateSerializer, BidDetailSerializer
@@ -62,7 +63,8 @@ class AuctionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 
 class BidListCreate(generics.ListCreateAPIView):
     # queryset = Bid.objects.all() 
-    serializer_class = BidListCreateSerializer 
+    serializer_class = BidListCreateSerializer
+    permission_classes = [IsOwnerOrAdmin]
 
     def get_queryset(self):
         auction_id = self.kwargs["auction_id"]
@@ -70,7 +72,26 @@ class BidListCreate(generics.ListCreateAPIView):
     
     def perform_create(self, serializer):
         auction_id = self.kwargs["auction_id"]
-        serializer.save(auction_id=auction_id)
+        new_bid = serializer.validated_data["bid"]
+        # new_bid = self.kwargs["bid"]
+        # serializer.save(auction_id=auction_id)
+
+        # VALIDATE IF BID IS OPEN
+        auction = Auction.objects.get(id=auction_id)
+        if auction.closing_date < timezone.now():
+            raise ValidationError({"auction": f"La puja ya está cerrada (closing date: {auction.closing_date})."})
+
+        # VALIDATE IF USER IS NOT THE OWNER
+        user = serializer.validated_data["username"]
+        if auction.auctioneer.username == user:
+            raise ValidationError({"username": f"El usuario que creó la subasta no puede pujar ({user})"})
+
+        # VALIDATE IF BID IS HIGHER THAN THE EXISTING BIDS
+        max_bid = Bid.objects.filter(auction=auction).aggregate(Max("bid", default=-1))["bid__max"]
+        if new_bid <= max_bid:
+            raise ValidationError({"bid": f"La puja debe ser mayor que la puja actual más alta (${max_bid})."})
+        
+        serializer.save(auction=auction)
 
 class BidRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Bid.objects.all() 

@@ -13,4 +13,4 @@ class IsOwnerOrAdmin(BasePermission):
             return True 
  
         # Permitir si el usuario es el creador o es administrador 
-        return obj.auctioneer == request.user or request.user.is_staff 
+        return obj.auctioneer == request.user or request.user.is_staff
