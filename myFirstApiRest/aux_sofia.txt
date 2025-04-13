@@ -7,6 +7,6 @@ USUARIO REGISTRADO
     "birth_date": "1996-12-12",
     "municipality": "",
     "locality": "",
-    "password":"Sofia1234"
+    "password":"Test1234!"
 } -> id: 3
 

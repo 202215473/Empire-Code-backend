@@ -18,8 +18,8 @@ class IsOwnerOrAdmin(BasePermission):
 
 class IsNotAuctionOwner(BasePermission): 
     """ 
-    Permite crear puja de una subasta solo si el usuario NO es el propietario 
-    o es administrador. Cualquiera puede consultar (GET). 
+    Permite crear puja de una subasta solo si el usuario NO es el propietario. 
+    Cualquiera puede consultar (GET).
     """ 
  
     def has_object_permission(self, request, view, obj): 
@@ -28,4 +28,4 @@ class IsNotAuctionOwner(BasePermission):
             return True 
  
         # Permitir si el usuario es el creador o es administrador 
-        return obj.auctioneer != request.user or request.user.is_staff
+        return obj.auctioneer != request.user

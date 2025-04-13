@@ -7,23 +7,26 @@ from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Category, Auction, Bid
 from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer , BidListCreateSerializer, BidDetailSerializer
 from .permissions import IsOwnerOrAdmin, IsNotAuctionOwner
 
 class CategoryListCreate(generics.ListCreateAPIView): 
+    permission_classes = [AllowAny]
     queryset = Category.objects.all()  # Consulta base de datos (Qué devuelvo)
     serializer_class = CategoryListCreateSerializer  # Llamada al serializador (cómo lo devuelvo)
 
 class CategoryRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView): 
+    permission_classes = [AllowAny]
     queryset = Category.objects.all() 
     serializer_class = CategoryDetailSerializer
 
 class AuctionListCreate(generics.ListCreateAPIView): 
     queryset = Auction.objects.all() 
     serializer_class = AuctionListCreateSerializer 
+    permission_classes = [AllowAny]
 
     def get_queryset(self): 
         queryset = Auction.objects.all() 
@@ -81,11 +84,6 @@ class BidListCreate(generics.ListCreateAPIView):
         if auction.closing_date < timezone.now():
             raise ValidationError({"auction": f"La puja ya está cerrada (closing date: {auction.closing_date})."})
 
-        # VALIDATE IF USER IS NOT THE OWNER
-        # username = serializer.validated_data["username"]
-        # if auction.auctioneer.username == user:
-        #     raise ValidationError({"username": f"El usuario que creó la subasta no puede pujar ({user})"})
-
         # VALIDATE IF BID IS HIGHER THAN THE EXISTING BIDS
         max_bid = Bid.objects.filter(auction=auction).aggregate(Max("bid", default=-1))["bid__max"]
         if new_bid <= max_bid:
@@ -94,6 +92,7 @@ class BidListCreate(generics.ListCreateAPIView):
         serializer.save(auction=auction)
 
 class BidRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, IsNotAuctionOwner]
     queryset = Bid.objects.all() 
     serializer_class = BidDetailSerializer
 
@@ -102,9 +101,17 @@ class BidRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
         return super().get_queryset().filter(auction_id=auction_id)
     
 class UserAuctionListView(APIView): 
-    permission_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated]
     def get(self, request, *args, **kwargs): 
         # Obtener las subastas del usuario autenticado 
         user_auctions = Auction.objects.filter(auctioneer=request.user) 
         serializer = AuctionListCreateSerializer(user_auctions, many=True) 
+        return Response(serializer.data) 
+
+class UserBidListView(APIView): 
+    permission_classes = [IsAuthenticated] 
+    def get(self, request, *args, **kwargs): 
+        # Obtener las pujas del usuario autenticado 
+        user_bids = Bid.objects.filter(username=request.user.username) 
+        serializer = BidListCreateSerializer(user_bids, many=True) 
         return Response(serializer.data) 
