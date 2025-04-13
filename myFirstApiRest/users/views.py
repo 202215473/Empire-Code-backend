@@ -12,7 +12,7 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
  
 class UserRegisterView(generics.CreateAPIView): 
-    permission_classes = [AllowAny] 
+    permission_classes = [AllowAny]
     queryset = CustomUser.objects.all() 
     serializer_class = UserSerializer 
  
