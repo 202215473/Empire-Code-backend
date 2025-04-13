@@ -106,6 +106,7 @@ class BidRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     
 class UserAuctionListView(APIView): 
     permission_classes = [IsAuthenticated]
+    
     def get(self, request, *args, **kwargs): 
         # Obtener las subastas del usuario autenticado 
         user_auctions = Auction.objects.filter(auctioneer=request.user) 

@@ -45,13 +45,15 @@ class AuctionDetailSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Auction 
         fields = '__all__' 
+        read_only_fields = ['auctioneer', 'creation_date']
  
     @extend_schema_field(serializers.BooleanField())
     def get_isOpen(self, obj):
         return obj.closing_date > timezone.now()
 
-    def validate_closing_date(self, obj, value): 
-        if value < obj.creation_date + timedelta(days=15): 
+    def validate_closing_date(self, value): 
+        creation_date = self.instance.creation_date
+        if value < creation_date + timedelta(days=15): 
             raise serializers.ValidationError("La fecha de cierre debe ser al menos 15 días después de la fecha de creación") 
         return value 
     
