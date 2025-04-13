@@ -25,8 +25,12 @@ class CategoryRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 
 class AuctionListCreate(generics.ListCreateAPIView): 
     queryset = Auction.objects.all() 
-    serializer_class = AuctionListCreateSerializer 
-    permission_classes = [AllowAny]
+    serializer_class = AuctionListCreateSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return [AllowAny()]
 
     def get_queryset(self): 
         queryset = Auction.objects.all() 
