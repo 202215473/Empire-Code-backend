@@ -10,6 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os 
+import dj_database_url 
+from dotenv import load_dotenv 
 from pathlib import Path
 from datetime import timedelta
 
@@ -33,6 +36,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     '0.0.0.0',
+    '@dpg-cvg8f5trie7s73bn9dhg-a.oregon-postgres.render.com'
 ]
 
 
@@ -90,13 +94,16 @@ WSGI_APPLICATION = 'myFirstApiRest.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+load_dotenv() 
+DATABASES = { 
+    'default': dj_database_url.config(default=os.getenv("DATABASE_URL")) 
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
