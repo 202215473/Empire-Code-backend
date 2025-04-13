@@ -28,4 +28,4 @@ class IsNotAuctionOwner(BasePermission):
             return True 
  
         # Permitir si el usuario es el creador o es administrador 
-        return obj.auctioneer != request.user
+        return obj.username != request.user.username
