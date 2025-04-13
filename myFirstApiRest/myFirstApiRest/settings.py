@@ -36,7 +36,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     '0.0.0.0',
-    '@dpg-cvg8f5trie7s73bn9dhg-a.oregon-postgres.render.com'
+    '@dpg-cvg8f5trie7s73bn9dhg-a.oregon-postgres.render.com',
+    'empire-code-backend.onrender.com'
 ]
 
 
