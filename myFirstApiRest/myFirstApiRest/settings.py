@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os 
+import dj_database_url 
+from dotenv import load_dotenv 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,6 +36,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     '0.0.0.0',
+    '@dpg-cvg8f5trie7s73bn9dhg-a.oregon-postgres.render.com'
 ]
 
 
@@ -44,8 +49,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'auctions', #para asociar la nueva aplicación (auction) al proyecto 
+    'auctions', #para asociar la nueva aplicación (auction) al proyecto
+    'users',
     'rest_framework', #para importar el framework django REST al proyecto 
+    'rest_framework_simplejwt', 
+    'rest_framework_simplejwt.token_blacklist',
     'drf_spectacular', #para importar la extensión drf spectacular al proyecto
     'corsheaders',
 ]
@@ -86,13 +94,16 @@ WSGI_APPLICATION = 'myFirstApiRest.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+load_dotenv() 
+DATABASES = { 
+    'default': dj_database_url.config(default=os.getenv("DATABASE_URL")) 
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -137,8 +148,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = { 
     'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination', 
-    'PAGE_SIZE': 5,  # Número de elementos que aparecen en la web
+    'PAGE_SIZE': 8,  # Número de elementos que aparecen en la web
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': ( 
+        'rest_framework_simplejwt.authentication.JWTAuthentication', 
+    ), 
 } 
 
 SPECTACULAR_SETTINGS = { 
@@ -147,3 +161,12 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0', 
     'SERVE_INCLUDE_SCHEMA': False, 
 } 
+
+SIMPLE_JWT = { 
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1), 
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7), 
+    "ROTATE_REFRESH_TOKENS": True, 
+    "BLACKLIST_AFTER_ROTATION": True,  
+}
+
+AUTH_USER_MODEL = 'users.CustomUser' 
