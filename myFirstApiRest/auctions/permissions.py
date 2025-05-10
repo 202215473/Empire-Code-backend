@@ -1,6 +1,7 @@
 
 from rest_framework.permissions import BasePermission, SAFE_METHODS 
- 
+from auctions.models import Auction
+
 class IsOwnerOrAdmin(BasePermission): 
     """ 
     Permite editar/eliminar una subasta solo si el usuario es el propietario 
@@ -22,11 +23,19 @@ class IsNotAuctionOwner(BasePermission):
     Cualquiera puede consultar (GET).
     """ 
  
-    def has_object_permission(self, request, view, obj): 
+    def has_permission(self, request, view): 
         # Permitir acceso de lectura a cualquier usuario (GET, HEAD, OPTIONS) 
+        auction_id = view.kwargs.get("auction_id")
+        if not auction_id:
+            return False
+        else:
+            auction = Auction.objects.get(id=auction_id)
+
         if request.method in SAFE_METHODS: 
             return True
 
-        # if request.user != null:  # En vez de IsAuthenticated
-            # Permitir si el usuario es el creador o es administrador 
-        return obj.username != request.user.username
+        if request.user:
+            return auction.auctioneer.username != request.user.username
+
+        return False
+        
