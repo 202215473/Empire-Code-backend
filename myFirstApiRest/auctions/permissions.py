@@ -25,7 +25,8 @@ class IsNotAuctionOwner(BasePermission):
     def has_object_permission(self, request, view, obj): 
         # Permitir acceso de lectura a cualquier usuario (GET, HEAD, OPTIONS) 
         if request.method in SAFE_METHODS: 
-            return True 
- 
-        # Permitir si el usuario es el creador o es administrador 
+            return True
+
+        # if request.user != null:  # En vez de IsAuthenticated
+            # Permitir si el usuario es el creador o es administrador 
         return obj.username != request.user.username
