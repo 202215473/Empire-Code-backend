@@ -2,7 +2,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers 
 from datetime import timedelta
 from django.utils import timezone
-from .models import Category, Auction, Bid
+from .models import Category, Auction, Bid, Comment
 
 class CategoryListCreateSerializer(serializers.ModelSerializer): 
     class Meta: 
@@ -97,3 +97,16 @@ class BidDetailSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Bid 
         fields = '__all__' 
+
+
+class CommentListCreateSerializer(serializers.ModelSerializer):
+    creation_date = serializers.DateTimeField(format="%Y-%m%dT%H:%M:%SZ", read_only=True)  # Porque creation_date no se debería poder modificar
+    last_modified = serializers.DateTimeField(format="%Y-%m%dT%H:%M:%SZ")
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+class CommentDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = '__all__'

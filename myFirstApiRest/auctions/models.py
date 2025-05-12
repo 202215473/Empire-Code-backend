@@ -49,3 +49,18 @@ class Bid(models.Model):
  
     def __str__(self): 
         return f"Bid of auction {self.auction} for {self.bid}$"
+
+
+class Comment(models.Model):
+    auction = models.ForeignKey(Auction, related_name="comments", on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, related_name="comments", on_delete=models.CASCADE)#, related_name="comments", on_delete=models.CASCADE)
+    title = models.CharField(max_length=150)
+    text = models.TextField(blank=True)
+    creation_date = models.DateTimeField(auto_now=True)  # read_only
+    last_modified = models.DateTimeField(auto_now=True)  # Se debe poder modificar
+
+    class Meta:
+        ordering=('auction', 'user', 'creation_date')
+    
+    def __str__(self):
+        return f"Comment for auction {self.auction} with id {self.id}"
