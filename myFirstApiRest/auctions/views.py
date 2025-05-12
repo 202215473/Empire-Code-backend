@@ -1,5 +1,7 @@
 from django.shortcuts import render
-from django.db.models import Q, Max
+from django.db.models import Q, Max, Avg, When, Case, Value, BooleanField
+from django.db.models.functions import Coalesce
+from django.utils.timezone import now
 from django.utils import timezone
 
 # Create your views here.
@@ -9,8 +11,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
-from .models import Category, Auction, Bid
-from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer , BidListCreateSerializer, BidDetailSerializer
+from .models import Category, Auction, Bid, Rating
+from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer , BidListCreateSerializer, BidDetailSerializer, RatingListCreateSerializer, RatingDetailSerializer
 from .permissions import IsOwnerOrAdmin, IsNotAuctionOwner
 
 class CategoryListCreate(generics.ListCreateAPIView): 
@@ -53,6 +55,17 @@ class AuctionListCreate(generics.ListCreateAPIView):
                 category_list = category.split(',')
                 queryset = queryset.filter(category__id__in=category_list)
 
+        show_open = params.get('showOpen', None)
+        if show_open:
+            queryset = queryset.annotate(
+                is_open=Case(
+                    When(closing_date__gt=now(), then=Value(True)),
+                    default=Value(False),
+                    output_field=BooleanField()
+                )
+            )
+            queryset = queryset.filter(is_open=True)
+
         price_min = params.get('priceMin', None)
         if price_min:
             queryset = queryset.filter(price__gte=price_min)
@@ -60,6 +73,18 @@ class AuctionListCreate(generics.ListCreateAPIView):
         price_max = params.get('priceMax', None)
         if price_max:
             queryset = queryset.filter(price__lte=price_max)
+
+        queryset = queryset.annotate(average_rating=Coalesce(Avg('ratings__rating'), 1.0))
+
+        rating_min = params.get('ratingMin', None)
+        if rating_min:
+            queryset = queryset.filter(average_rating__gte=rating_min)
+
+        rating_max = params.get('ratingMax', None)
+        if rating_max:
+            queryset = queryset.filter(average_rating__lte=rating_max)
+
+        queryset = queryset.order_by('id')
 
         return queryset 
 
@@ -69,7 +94,7 @@ class AuctionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AuctionDetailSerializer
 
 class BidListCreate(generics.ListCreateAPIView):
-    # queryset = Bid.objects.all() 
+    queryset = Bid.objects.all() 
     serializer_class = BidListCreateSerializer
     permission_classes = [IsNotAuctionOwner]
 
@@ -97,7 +122,7 @@ class BidListCreate(generics.ListCreateAPIView):
 
 class BidRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
-    # queryset = Bid.objects.all() 
+    queryset = Bid.objects.all() 
     serializer_class = BidDetailSerializer
 
     def get_queryset(self):
@@ -120,3 +145,39 @@ class UserBidListView(APIView):
         user_bids = Bid.objects.filter(username=request.user.username) 
         serializer = BidListCreateSerializer(user_bids, many=True) 
         return Response(serializer.data) 
+    
+
+class RatingListCreate(generics.ListCreateAPIView):
+    serializer_class = RatingListCreateSerializer
+    queryset = Rating.objects.all()
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
+    def get_queryset(self):
+        auction_id = self.kwargs["auction_id"]
+        return super().get_queryset().filter(auction_id=auction_id)
+    
+    """def get_serializer_context(self):
+        context = super().get_serializer_context()
+        auction_id = self.kwargs["auction_id"]
+        context["auction"] = Auction.objects.get(id=auction_id)
+        return context"""
+    
+    def perform_create(self, serializer):
+        auction = Auction.objects.get(id=self.kwargs["auction_id"])
+        user = self.request.user
+
+        if Rating.objects.filter(user=user, auction=auction).exists():
+            raise ValidationError("You have already rated this auction.")
+
+        serializer.save(user=user, auction=auction)
+
+
+class RatingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsOwnerOrAdmin] 
+    serializer_class = RatingDetailSerializer
+
+    queryset = Rating.objects.all() 
