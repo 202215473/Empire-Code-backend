@@ -119,14 +119,14 @@ class RatingListCreateSerializer(serializers.ModelSerializer):
         fields = '__all__' 
         read_only_fields = ['user', 'auction']
 
-    def create(self, validated_data):
+    """def create(self, validated_data):
         user = self.context['request'].user
         auction = self.context['auction']
 
         if Rating.objects.filter(user=user, auction=auction).exists():
             raise serializers.ValidationError("You have already rated this auction.")
         else:
-            return super().create(validated_data)
+            return super().create(validated_data)"""
     
 
 class RatingDetailSerializer(serializers.ModelSerializer):

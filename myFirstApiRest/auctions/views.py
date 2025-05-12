@@ -94,7 +94,7 @@ class AuctionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AuctionDetailSerializer
 
 class BidListCreate(generics.ListCreateAPIView):
-    # queryset = Bid.objects.all() 
+    queryset = Bid.objects.all() 
     serializer_class = BidListCreateSerializer
     permission_classes = [IsNotAuctionOwner]
 
@@ -122,7 +122,7 @@ class BidListCreate(generics.ListCreateAPIView):
 
 class BidRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
-    # queryset = Bid.objects.all() 
+    queryset = Bid.objects.all() 
     serializer_class = BidDetailSerializer
 
     def get_queryset(self):
@@ -160,11 +160,20 @@ class RatingListCreate(generics.ListCreateAPIView):
         auction_id = self.kwargs["auction_id"]
         return super().get_queryset().filter(auction_id=auction_id)
     
-    def perform_create(self, serializer):
+    """def get_serializer_context(self):
+        context = super().get_serializer_context()
         auction_id = self.kwargs["auction_id"]
-        auction = Auction.objects.get(id=auction_id)
+        context["auction"] = Auction.objects.get(id=auction_id)
+        return context"""
+    
+    def perform_create(self, serializer):
+        auction = Auction.objects.get(id=self.kwargs["auction_id"])
+        user = self.request.user
 
-        serializer.save(user=self.request.user, auction=auction)
+        if Rating.objects.filter(user=user, auction=auction).exists():
+            raise ValidationError("You have already rated this auction.")
+
+        serializer.save(user=user, auction=auction)
 
 
 class RatingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
