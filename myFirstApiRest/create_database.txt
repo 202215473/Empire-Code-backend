@@ -1,0 +1,462 @@
+# First, create some users
+from users.models import CustomUser
+CustomUser.objects.create_superuser(username='sofia', email='sofia@gmail.com', password='StarWars3', birth_date='2000-01-01') 
+CustomUser.objects.create(username='sofia2', email='sofia2@gmail.com', password='StarWars3', birth_date='2002-09-05') 
+CustomUser.objects.create(username='sofia3', email='sofia3@gmail.com', password='StarWars3', birth_date='2002-09-05') 
+
+# Now we will create the database
+from users.models import CustomUser
+from auctions.models import Category, Auction #, Rating
+from django.utils import timezone
+from datetime import timedelta
+import random
+
+# Get some users
+user = CustomUser.objects.get(username='isa.morell')
+user2 = CustomUser.objects.get(username='sofia2')
+user3 = CustomUser.objects.get(username='sofia3')
+
+# Initialize some categories
+smartphones = Category.objects.get_or_create(name='smartphones')[0]
+laptops = Category.objects.get_or_create(name='laptops')[0]
+beauty = Category.objects.get_or_create(name='beauty')[0]
+headphones = Category.objects.get_or_create(name='headphones')[0]
+gaming = Category.objects.get_or_create(name='gaming')[0]
+home = Category.objects.get_or_create(name='home')[0]
+groceries = Category.objects.get_or_create(name='groceries')[0]
+furniture = Category.objects.get_or_create(name='furniture')[0]
+fragrances = Category.objects.get_or_create(name='fragrances')[0]
+
+# Initialize the products
+data = [
+    {
+        "id": 1,
+        "title": "iPhone 9",
+        "description": "An apple mobile which is nothing like apple",
+        "price": 549,
+        "stock": 94,
+        "brand": "Apple",
+        "category": smartphones,
+        "thumbnail": "https://cdn.dummyjson.com/products/images/smartphones/iPhone%206/thumbnail.png"
+    },
+    {
+        "id": 2,
+        "title": "iPhone X",
+        "description": "SIM-Free, Model A19211 6.5-inch Super Retina HD display with OLED technology A12 Bionic chip with ...",
+        "price": 899,
+        "stock": 34,
+        "brand": "Apple",
+        "category": smartphones,
+        "thumbnail": "https://cdn.dummyjson.com/products/images/smartphones/iPhone%20X/thumbnail.png"
+    },
+    {
+        "id": 3,
+        "title": "Samsung Galaxy S7",
+        "description": "The Samsung Galaxy S7 is a flagship smartphone known for its sleek design and advanced features. It features a high-resolution display, powerful camera, and robust performance.",
+        "price": 1249,
+        "stock": 36,
+        "brand": "Samsung",
+        "category": smartphones,
+        "thumbnail": "https://cdn.dummyjson.com/products/images/smartphones/Samsung%20Galaxy%20S7/thumbnail.png"
+    },
+    {
+        "id": 4,
+            "title": "Samsung Galaxy S10",
+        "description": "The Samsung Galaxy S10 is a flagship device featuring a dynamic AMOLED display, versatile camera system, and powerful performance. It represents innovation and excellence in smartphone technology.",
+        "price": 699.99,
+        "stock": 123,
+        "brand": "Samsung",
+        "category": smartphones,
+        "thumbnail": "https://cdn.dummyjson.com/products/images/smartphones/Samsung%20Galaxy%20S10/thumbnail.png"
+    },
+    {
+        "id": 5,
+        "title": "Huawei Matebook X Pro",
+        "description": "The Huawei Matebook X Pro is a slim and stylish laptop with a high-resolution touchscreen display, offering a premium experience for users on the go.",
+    "price": 1399.99,
+        "stock": 32,
+        "brand": "Huawei",
+        "category": smartphones,
+        "thumbnail": "https://cdn.dummyjson.com/products/images/laptops/Huawei%20Matebook%20X%20Pro/thumbnail.png"
+    },
+    {
+        "id": 6,
+        "title": "MacBook Pro",
+        "description": "MacBook Pro 2021 with mini-LED display may launch between September, November",
+        "price": 1749,
+        "stock": 83,
+        "brand": "Apple",
+        "category": laptops,
+        "thumbnail": "https://cdn.dummyjson.com/products/images/laptops/Apple%20MacBook%20Pro%2014%20Inch%20Space%20Grey/thumbnail.png"
+    },
+    {
+        "id": 7,
+        "title": "Samsung Galaxy S8",
+        "description": "The Samsung Galaxy S8 is a premium smartphone with an Infinity Display, offering a stunning visual experience. It boasts advanced camera capabilities and cutting-edge technology.",
+        "price": 499,
+        "stock": 50,
+        "brand": "Samsung",
+        "category": laptops,
+        "thumbnail": "https://cdn.dummyjson.com/products/images/smartphones/Samsung%20Galaxy%20S8/thumbnail.png"
+    },
+    {
+        "id": 8,
+        "title": "Lenovo Yoga 920",
+        "description": "The Lenovo Yoga 920 is a 2-in-1 convertible laptop with a flexible hinge, allowing you to use it as a laptop or tablet, offering versatility and portability.",
+            "price": 1499,
+        "stock": 68,
+        "brand": "Lenovo",
+        "category": laptops,
+        "thumbnail": "https://cdn.dummyjson.com/products/images/laptops/Lenovo%20Yoga%20920/thumbnail.png"
+    },
+    {
+        "id": 9,
+        "title": "New DELL XPS 13 9300 Laptop",
+        "description": "The New DELL XPS 13 9300 Laptop is a compact and powerful device, featuring a virtually borderless InfinityEdge display and high-end performance for various tasks.",
+        "price": 1499,
+        "stock": 96,
+        "brand": "Dell",
+        "category": laptops,
+        "thumbnail": "https://cdn.dummyjson.com/products/images/laptops/New%20DELL%20XPS%2013%209300%20Laptop/thumbnail.png"
+    },
+    {
+        "id": 10,
+        "title": "Red Nail Polish",
+        "description": "The Red Nail Polish offers a rich and glossy red hue for vibrant and polished nails. With a quick-drying formula, it provides a salon-quality finish at home.",
+        "price": 8.99,
+        "stock": 89,
+        "brand": "Nail Couture",
+        "category": beauty,
+        "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Red%20Nail%20Polish/thumbnail.png"
+    },
+    {
+        "id": 11,
+        "title": "Annibale Colombo Bed",
+        "description": "The Annibale Colombo Bed is a luxurious and elegant bed frame, crafted with high-quality materials for a comfortable and stylish bedroom.",
+        "price": 1899.99,
+        "stock": 88,
+        "brand": "Annibale Colombo",
+        "category": furniture,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/furniture/annibale-colombo-bed/thumbnail.webp"      
+    },
+    {
+        "id": 12,
+        "title": "Annibale Colombo Sofa",
+        "description": "The Annibale Colombo Sofa is a sophisticated and comfortable seating option, featuring exquisite design and premium upholstery for your living room.",
+        "price": 2499.99,
+        "stock": 60,
+        "brand": "Annibale Colombo",
+        "category": furniture,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/furniture/annibale-colombo-sofa/thumbnail.webp"     
+    },
+    {
+        "id": 13,
+        "title": "Bedside Table African Cherry",
+        "description": "The Bedside Table in African Cherry is a stylish and functional addition to your bedroom, providing convenient storage space and a touch of elegance.",
+        "price": 299.99,
+        "stock": 64,
+        "brand": "Furniture Co.",
+        "category": furniture,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/furniture/bedside-table-african-cherry/thumbnail.webp"
+    },
+    {
+        "id": 14,
+        "title": "Knoll Saarinen Executive Conference Chair",
+        "description": "The Knoll Saarinen Executive Conference Chair is a modern and ergonomic chair, perfect for your office or conference room with its timeless design.",
+        "price": 499.99,
+        "stock": 26,
+        "brand": "Knoll",
+        "category": furniture,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/furniture/knoll-saarinen-executive-conference-chair/thumbnail.webp"
+    },
+    {
+        "id": 15,
+        "title": "Wooden Bathroom Sink With Mirror",
+        "description": "The Wooden Bathroom Sink with Mirror is a unique and stylish addition to your bathroom, featuring a wooden sink countertop and a matching mirror.",
+        "price": 799.99,
+        "stock": 7,
+        "brand": "Bath Trends",
+        "category": furniture,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/furniture/wooden-bathroom-sink-with-mirror/thumbnail.webp"
+    },
+    {
+        "id": 16,
+        "title": "Apple",
+        "description": "Fresh and crisp apples, perfect for snacking or incorporating into various recipes.",      
+        "price": 1.99,
+        "stock": 8,
+        "brand": "Lidl",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/apple/thumbnail.webp"
+    },
+    {
+        "id": 17,
+        "title": "Beef Steak",
+        "description": "High-quality beef steak, great for grilling or cooking to your preferred level of doneness.",
+        "price": 12.99,
+        "stock": 86,
+        "brand": "Lidl",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/beef-steak/thumbnail.webp"
+    },
+    {
+        "id": 18,
+        "title": "Cat Food",
+        "description": "Nutritious cat food formulated to meet the dietary needs of your feline friend.",
+        "price": 8.99,
+        "stock": 46,
+        "brand": "Lidl",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/cat-food/thumbnail.webp"
+    },
+    {
+        "id": 19,
+        "title": "Chicken Meat",
+        "description": "Fresh and tender chicken meat, suitable for various culinary preparations.",
+        "price": 9.99,
+        "stock": 97,
+        "brand": "Lidl",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/chicken-meat/thumbnail.webp"
+    },
+    {
+        "id": 20,
+        "title": "Cooking Oil",
+        "description": "Versatile cooking oil suitable for frying, sautéing, and various culinary applications.",  
+        "price": 4.99,
+        "stock": 10,
+        "brand": "Lidl",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/cooking-oil/thumbnail.webp"
+    },
+    {
+        "id": 21,
+        "title": "Cucumber",
+        "description": "Crisp and hydrating cucumbers, ideal for salads, snacks, or as a refreshing side.",        
+        "price": 1.49,
+        "stock": 84,
+        "brand": "Carrefour",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/cucumber/thumbnail.webp"
+    },
+    {
+        "id": 22,
+        "title": "Dog Food",
+        "description": "Specially formulated dog food designed to provide essential nutrients for your canine companion.",
+        "price": 10.99,
+        "stock": 71,
+        "brand": "Carrefour",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/dog-food/thumbnail.webp"
+    },
+    {
+        "id": 23,
+        "title": "Eggs",
+        "description": "Fresh eggs, a versatile ingredient for baking, cooking, or breakfast.",
+        "price": 2.99,
+        "stock": 9,
+        "brand": "Carrefour",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/eggs/thumbnail.webp"
+    },
+    {
+        "id": 24,
+        "title": "Fish Steak",
+        "description": "Quality fish steak, suitable for grilling, baking, or pan-searing.",
+        "price": 14.99,
+        "stock": 74,
+        "brand": "Carrefour",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/fish-steak/thumbnail.webp"
+    },
+    {
+        "id": 25,
+        "title": "Green Bell Pepper",
+        "description": "Fresh and vibrant green bell pepper, perfect for adding color and flavor to your dishes.", 
+        "price": 1.29,
+        "stock": 33,
+        "brand": "Carrefour",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/green-bell-pepper/thumbnail.webp"
+    },
+    {
+        "id": 26,
+        "title": "Green Chili Pepper",
+        "description": "Spicy green chili pepper, ideal for adding heat to your favorite recipes.",
+        "price": 0.99,
+        "stock": 3,
+        "brand": "Too Good to Go",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/green-chili-pepper/thumbnail.webp"        
+    },
+    {
+        "id": 27,
+        "title": "Honey Jar",
+        "description": "Pure and natural honey in a convenient jar, perfect for sweetening beverages or drizzling over food.",
+        "price": 6.99,
+        "stock": 34,
+        "brand": "Too Good to Go",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/honey-jar/thumbnail.webp"
+    },
+    {
+        "id": 28,
+        "title": "Ice Cream",
+        "description": "Creamy and delicious ice cream, available in various flavors for a delightful treat.",     
+        "price": 5.49,
+        "stock": 27,
+        "brand": "Too Good to Go",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/ice-cream/thumbnail.webp"
+    },
+    {
+        "id": 29,
+        "title": "Juice",
+        "description": "Refreshing fruit juice, packed with vitamins and great for staying hydrated.",
+        "price": 3.99,
+        "stock": 50,
+        "brand": "Too Good to Go",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/juice/thumbnail.webp"
+    },
+    {
+        "id": 30,
+        "title": "Kiwi",
+        "description": "Nutrient-rich kiwi, perfect for snacking or adding a tropical twist to your dishes.",      
+        "price": 2.49,
+        "stock": 99,
+        "brand": "Too Good to Go",
+        "category": groceries,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/groceries/kiwi/thumbnail.webp"
+    },
+    {
+        "id": 31,
+        "title": "Essence Mascara Lash Princess",
+        "description": "The Essence Mascara Lash Princess is a popular mascara known for its volumizing and lengthening effects. Achieve dramatic lashes with this long-lasting and cruelty-free formula.",
+        "price": 9.99,
+        "stock": 99,
+        "brand": "Essence",
+        "category": beauty,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp"
+    },
+    {
+        "id": 32,
+        "title": "Eyeshadow Palette with Mirror",
+        "description": "The Eyeshadow Palette with Mirror offers a versatile range of eyeshadow shades for creating stunning eye looks. With a built-in mirror, it's convenient for on-the-go makeup application.",
+        "price": 19.99,
+        "stock": 34,
+        "brand": "Glamour Beauty",
+        "category": beauty,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/beauty/eyeshadow-palette-with-mirror/thumbnail.webp"
+    },
+    {
+        "id": 33,
+        "title": "Powder Canister",
+        "description": "The Powder Canister is a finely milled setting powder designed to set makeup and control shine. With a lightweight and translucent formula, it provides a smooth and matte finish.",
+        "price": 14.99,
+        "rating": 4.64,
+        "stock": 89,
+        "brand": "Velvet Touch",
+        "category": beauty,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/beauty/powder-canister/thumbnail.webp"
+    },
+    {
+        "id": 34,
+        "title": "Red Lipstick",
+        "description": "The Red Lipstick is a classic and bold choice for adding a pop of color to your lips. With a creamy and pigmented formula, it provides a vibrant and long-lasting finish.",
+        "price": 12.99,
+        "stock": 91,
+        "brand": "Chic Cosmetics",
+        "category": beauty,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/beauty/red-lipstick/thumbnail.webp"
+    },
+    {
+        "id": 35,
+        "title": "Red Nail Polish",
+        "description": "The Red Nail Polish offers a rich and glossy red hue for vibrant and polished nails. With a quick-drying formula, it provides a salon-quality finish at home.",
+        "price": 8.99,
+        "stock": 79,
+        "brand": "Nail Couture",
+        "category": beauty,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/beauty/red-nail-polish/thumbnail.webp"
+    },
+    {
+        "id": 36,
+        "title": "Calvin Klein CK One",
+        "description": "CK One by Calvin Klein is a classic unisex fragrance, known for its fresh and clean scent. It's a versatile fragrance suitable for everyday wear.",
+        "price": 49.99,
+        "stock": 29,
+        "brand": "Calvin Klein",
+        "category": fragrances,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/calvin-klein-ck-one/thumbnail.webp"      
+    },
+    {
+        "id": 37,
+        "title": "Chanel Coco Noir Eau De",
+        "description": "Coco Noir by Chanel is an elegant and mysterious fragrance, featuring notes of grapefruit, rose, and sandalwood. Perfect for evening occasions.",
+        "price": 129.99,
+        "stock": 58,
+        "brand": "Chanel",
+        "category": fragrances,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/chanel-coco-noir-eau-de/thumbnail.webp"  
+    },
+    {
+        "id": 38,
+        "title": "Dior J'adore",
+        "description": "J'adore by Dior is a luxurious and floral fragrance, known for its blend of ylang-ylang, rose, and jasmine. It embodies femininity and sophistication.",
+        "price": 89.99,
+        "stock": 98,
+        "brand": "Dior",
+        "category": fragrances,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/dior-j'adore/thumbnail.webp"
+    },
+    {
+        "id": 39,
+        "title": "Dolce Shine Eau de",
+        "description": "Dolce Shine by Dolce & Gabbana is a vibrant and fruity fragrance, featuring notes of mango, jasmine, and blonde woods. It's a joyful and youthful scent.",
+        "price": 69.99,
+        "stock": 4,
+        "brand": "Dolce & Gabbana",
+        "category": fragrances,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/dolce-shine-eau-de/thumbnail.webp"       
+    },
+    {
+        "id": 40,
+        "title": "Gucci Bloom Eau de",
+        "description": "Gucci Bloom by Gucci is a floral and captivating fragrance, with notes of tuberose, jasmine, and Rangoon creeper. It's a modern and romantic scent.",
+        "price": 79.99,
+        "stock": 91,
+        "brand": "Gucci",
+        "category": fragrances,
+        "thumbnail": "https://cdn.dummyjson.com/product-images/fragrances/gucci-bloom-eau-de/thumbnail.webp"       
+    }
+]
+
+#Para cada ejemplo, cremaos un nuevo objeto Subasta y lo guardamos en BD.
+for item in data:
+    auction = Auction(
+        id=item["id"],
+        title=item["title"],
+        description=item["description"],
+        price=item["price"],
+        # Comment rating line if using the Rating model
+        rating=random.randint(1,5),
+        stock=item["stock"],
+        brand=item["brand"],
+        category=item["category"],
+        thumbnail=item["thumbnail"],
+        closing_date = timezone.now() + timedelta(days=30),
+        auctioneer=random.choice([user, user2, user3])
+    )
+    auction.save()
+
+# If using the Rating model, initialize some ratings
+i = 0
+for auct in Auction.objects.all():
+    rating = Rating(
+        id=i,
+        rating=random.randint(1,5),
+        auction=auct,
+        user=auct.auctioneer
+    )
+    rating.save()
