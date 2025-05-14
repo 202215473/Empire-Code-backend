@@ -22,7 +22,7 @@ class MinimalUserSerializer(serializers.ModelSerializer):
     class Meta: 
         model = CustomUser 
         fields = ('id', 'username') 
-    
+
 class ChangePasswordSerializer(serializers.Serializer): 
     old_password = serializers.CharField(required=True) 
     new_password = serializers.CharField(required=True) 

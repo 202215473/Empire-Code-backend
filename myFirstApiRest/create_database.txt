@@ -6,13 +6,14 @@ CustomUser.objects.create(username='sofia3', email='sofia3@gmail.com', password=
 
 # Now we will create the database
 from users.models import CustomUser
-from auctions.models import Category, Auction #, Rating
+from auctions.models import Category, Auction, Rating
 from django.utils import timezone
 from datetime import timedelta
 import random
 
 # Get some users
-user = CustomUser.objects.get(username='isa.morell')
+# user = CustomUser.objects.get(username='isa.morell')
+user = CustomUser.objects.get(username='sofia')
 user2 = CustomUser.objects.get(username='sofia2')
 user3 = CustomUser.objects.get(username='sofia3')
 
@@ -432,7 +433,7 @@ data = [
     }
 ]
 
-#Para cada ejemplo, cremaos un nuevo objeto Subasta y lo guardamos en BD.
+# For each product created, we will create a new Auction object and save ir in the database
 for item in data:
     auction = Auction(
         id=item["id"],
@@ -440,7 +441,7 @@ for item in data:
         description=item["description"],
         price=item["price"],
         # Comment rating line if using the Rating model
-        rating=random.randint(1,5),
+        # rating=random.randint(1,5),
         stock=item["stock"],
         brand=item["brand"],
         category=item["category"],

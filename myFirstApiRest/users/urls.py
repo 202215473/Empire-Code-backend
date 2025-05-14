@@ -1,7 +1,7 @@
 from django.urls import path 
 from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView) 
 
-from .views import UserRegisterView, UserListView, UserRetrieveUpdateDestroyView, UserProfileView, ChangePasswordView, LogoutView, CurrentUserView
+from .views import UserRegisterView, UserListView, UserRetrieveUpdateDestroyView, UserProfileView, ChangePasswordView, LogoutView, CurrentUserView, PublicUserView
 from auctions.views import UserAuctionListView, UserBidListView
  
 app_name="users" 
@@ -16,4 +16,5 @@ urlpatterns = [
     path('my-auctions/', UserAuctionListView.as_view(), name='user-auctions'),  # protegido con permisos
     path('my-bids/', UserBidListView.as_view(), name='user-auctions'),  # protegido con permisos
     path('me/', CurrentUserView.as_view(), name='current-user'),
+    path('public/<int:pk>/', PublicUserView.as_view(), name='get-username'),
 ]
