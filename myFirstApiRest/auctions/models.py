@@ -53,11 +53,11 @@ class Bid(models.Model):
 
 class Comment(models.Model):
     auction = models.ForeignKey(Auction, related_name="comments", on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, related_name="comments", on_delete=models.CASCADE)#, related_name="comments", on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, related_name="comments", on_delete=models.CASCADE)
     title = models.CharField(max_length=150)
     text = models.TextField(blank=True)
-    creation_date = models.DateTimeField(auto_now=True)  # read_only
-    last_modified = models.DateTimeField(auto_now=True)  # Se debe poder modificar
+    creation_date = models.DateTimeField(auto_now_add=True)  # auto_now_add edits the field ONLY the first time i use it
+    last_modified = models.DateTimeField(auto_now=True)  # auto_now updates every time we save a comment
 
     class Meta:
         ordering=('auction', 'user', 'creation_date')

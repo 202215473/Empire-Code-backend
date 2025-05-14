@@ -1,4 +1,4 @@
-USUARIO REGISTRADO
+#USUARIO REGISTRADO
 {
     "username": "sofia",
     "first_name": "Sofia",
@@ -10,23 +10,25 @@ USUARIO REGISTRADO
     "password":"Test1234!"
 } -> id: 3
 
-SUPERUSUARIO CREADO
+#SUPERUSUARIO CREADO
 from users.models import CustomUser
 CustomUser.objects.create_superuser(username='sofia', email='sofia@gmail.com', password='StarWars3', birth_date='2000-01-01') 
+CustomUser.objects.create(username='sofia2', email='sofia2@gmail.com', password='StarWars3', birth_date='2002-09-05') 
+CustomUser.objects.create(username='sofia3', email='sofia3@gmail.com', password='StarWars3', birth_date='2002-09-05') 
 
 
-
-
-SCRIPT PARA CREAR NUEVAS SUBASTAS
+#SCRIPT PARA CREAR NUEVAS SUBASTAS
 from auctions.models import Category, Auction
 from users.models import CustomUser
 from django.utils import timezone
 from datetime import timedelta
 
-user = CustomUser.objects.get(username='sofia2')
-category_smartphones = Category.objects.get(name='smartphones')
-category_laptops = Category.objects.get(name='laptops')
-category_beauty = Category.objects.get(name='beauty')
+user3 = CustomUser.objects.get(username='sofia3')
+user2 = CustomUser.objects.get(username='sofia2')
+
+smartphones = Category.objects.get_or_create(name='smartphones')[0]
+laptops = Category.objects.get_or_create(name='laptops')[0]
+beauty = Category.objects.get_or_create(name='beauty')[0]
 
 
 #Declaramos una array con 10 elementos de ejemplo de subastas.
@@ -40,7 +42,7 @@ data = [
             "rating": 4.69,
             "stock": 94,
             "brand": "Apple",
-            "category": category_smartphones,
+            "category": smartphones,
             "thumbnail": "https://cdn.dummyjson.com/products/images/smartphones/iPhone%206/thumbnail.png"
         },
         {
@@ -51,7 +53,7 @@ data = [
             "rating": 4.44,
             "stock": 34,
             "brand": "Apple",
-            "category": category_smartphones,
+            "category": smartphones,
             "thumbnail": "https://cdn.dummyjson.com/products/images/smartphones/iPhone%20X/thumbnail.png"
         },
         {
@@ -62,7 +64,7 @@ data = [
             "rating": 4.09,
             "stock": 36,
             "brand": "Samsung",
-            "category": category_smartphones,
+            "category": smartphones,
             "thumbnail": "https://cdn.dummyjson.com/products/images/smartphones/Samsung%20Galaxy%20S7/thumbnail.png"
         },
         {
@@ -73,7 +75,7 @@ data = [
             "rating": 4.3,
             "stock": 123,
             "brand": "Samsung",
-            "category": category_smartphones,
+            "category": smartphones,
             "thumbnail": "https://cdn.dummyjson.com/products/images/smartphones/Samsung%20Galaxy%20S10/thumbnail.png"
         },
         {
@@ -84,7 +86,7 @@ data = [
             "rating": 4.09,
             "stock": 32,
             "brand": "Huawei",
-            "category": category_smartphones,
+            "category": smartphones,
             "thumbnail": "https://cdn.dummyjson.com/products/images/laptops/Huawei%20Matebook%20X%20Pro/thumbnail.png"
         },
         {
@@ -95,7 +97,7 @@ data = [
             "rating": 4.57,
             "stock": 83,
             "brand": "Apple",
-            "category": category_laptops,
+            "category": laptops,
             "thumbnail": "https://cdn.dummyjson.com/products/images/laptops/Apple%20MacBook%20Pro%2014%20Inch%20Space%20Grey/thumbnail.png"
         },
         {
@@ -106,7 +108,7 @@ data = [
             "rating": 4.25,
             "stock": 50,
             "brand": "Samsung",
-            "category": category_laptops,
+            "category": laptops,
             "thumbnail": "https://cdn.dummyjson.com/products/images/smartphones/Samsung%20Galaxy%20S8/thumbnail.png"
         },
         {
@@ -117,7 +119,7 @@ data = [
             "rating": 4.43,
             "stock": 68,
             "brand": "Lenovo",
-            "category": category_laptops,
+            "category": laptops,
             "thumbnail": "https://cdn.dummyjson.com/products/images/laptops/Lenovo%20Yoga%20920/thumbnail.png"
         },
         {
@@ -128,7 +130,7 @@ data = [
             "rating": 4.54,
             "stock": 96,
             "brand": "Dell",
-            "category": category_laptops,
+            "category": laptops,
             "thumbnail": "https://cdn.dummyjson.com/products/images/laptops/New%20DELL%20XPS%2013%209300%20Laptop/thumbnail.png"
         },
         {
@@ -139,7 +141,7 @@ data = [
             "rating": 4.43,
             "stock": 89,
             "brand": "Nail Couture",
-            "category": category_beauty,
+            "category": beauty,
             "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Red%20Nail%20Polish/thumbnail.png"
         }
 ]
@@ -160,262 +162,25 @@ for item in data:
         category=item["category"],
         thumbnail=item["thumbnail"],
         closing_date = timezone.now() + timedelta(days=30),
-        auctioneer=user
+        auctioneer=user2
     )
     auction.save()
 
 
-SEGUNDO SCRIPT CREANDO MÁS CATEGORÍAS
+# SEGUNDO SCRIPT CREANDO MÁS CATEGORÍAS
 from auctions.models import Category, Auction
 from users.models import CustomUser
 from django.utils import timezone
 from datetime import timedelta
-
-user = CustomUser.objects.get(username='sofia2')
 
 # Crear nuevas categorías
-category_headphones = Category.objects.create(name='headphones')
-category_gaming = Category.objects.create(name='gaming')
-category_home = Category.objects.create(name='home')
+headphones = Category.objects.get_or_create(name='headphones')[0]
+gaming = Category.objects.get_or_create(name='gaming')[0]
+home = Category.objects.get_or_create(name='home')[0]
 
-# Nuevas subastas (20 productos)
-new_data = [
-    {
-        "id": 11,
-        "title": "Sony WH-1000XM4",
-        "description": "Industry-leading noise canceling headphones with premium sound quality.",
-        "price": 348,
-        "rating": 4.7,
-        "stock": 45,
-        "brand": "Sony",
-        "category": category_headphones,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/headphones/SonyWH1000XM4/thumbnail.png"
-    },
-    {
-        "id": 12,
-        "title": "Bose QuietComfort 45",
-        "description": "High-fidelity audio with world-class noise cancellation.",
-        "price": 329,
-        "rating": 4.6,
-        "stock": 60,
-        "brand": "Bose",
-        "category": category_headphones,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/headphones/BoseQC45/thumbnail.png"
-    },
-    {
-        "id": 13,
-        "title": "AirPods Max",
-        "description": "Apple's premium over-ear headphones with spatial audio.",
-        "price": 549,
-        "rating": 4.8,
-        "stock": 35,
-        "brand": "Apple",
-        "category": category_headphones,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/headphones/AirPodsMax/thumbnail.png"
-    },
-    {
-        "id": 14,
-        "title": "SteelSeries Arctis 7",
-        "description": "Wireless gaming headset with DTS Headphone:X v2.0.",
-        "price": 149,
-        "rating": 4.5,
-        "stock": 50,
-        "brand": "SteelSeries",
-        "category": category_gaming,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/gaming/Arctis7/thumbnail.png"
-    },
-    {
-        "id": 15,
-        "title": "Logitech G Pro Wireless Mouse",
-        "description": "Lightweight wireless gaming mouse for esports professionals.",
-        "price": 129,
-        "rating": 4.6,
-        "stock": 70,
-        "brand": "Logitech",
-        "category": category_gaming,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/gaming/LogitechGPro/thumbnail.png"
-    },
-    {
-        "id": 16,
-        "title": "Razer BlackWidow V3",
-        "description": "Mechanical gaming keyboard with Razer Green switches.",
-        "price": 139,
-        "rating": 4.4,
-        "stock": 90,
-        "brand": "Razer",
-        "category": category_gaming,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/gaming/BlackWidowV3/thumbnail.png"
-    },
-    {
-        "id": 17,
-        "title": "Xbox Series X",
-        "description": "Power your dreams with the fastest, most powerful Xbox ever.",
-        "price": 499,
-        "rating": 4.8,
-        "stock": 40,
-        "brand": "Microsoft",
-        "category": category_gaming,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/gaming/XboxSeriesX/thumbnail.png"
-    },
-    {
-        "id": 18,
-        "title": "PlayStation 5",
-        "description": "Next-gen gaming console from Sony with immersive gameplay.",
-        "price": 499,
-        "rating": 4.9,
-        "stock": 38,
-        "brand": "Sony",
-        "category": category_gaming,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/gaming/PS5/thumbnail.png"
-    },
-    {
-        "id": 19,
-        "title": "Nintendo Switch OLED",
-        "description": "New vibrant OLED screen for portable gaming on the go.",
-        "price": 349,
-        "rating": 4.7,
-        "stock": 65,
-        "brand": "Nintendo",
-        "category": category_gaming,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/gaming/SwitchOLED/thumbnail.png"
-    },
-    {
-        "id": 20,
-        "title": "Instant Pot Duo",
-        "description": "7-in-1 electric pressure cooker, slow cooker, rice cooker, and more.",
-        "price": 99,
-        "rating": 4.6,
-        "stock": 110,
-        "brand": "Instant Pot",
-        "category": category_home,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/home_appliances/InstantPot/thumbnail.png"
-    },
-    {
-        "id": 21,
-        "title": "Dyson V11 Vacuum",
-        "description": "Cordless vacuum with intelligent cleaning modes.",
-        "price": 599,
-        "rating": 4.7,
-        "stock": 25,
-        "brand": "Dyson",
-        "category": category_home,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/home_appliances/DysonV11/thumbnail.png"
-    },
-    {
-        "id": 22,
-        "title": "iRobot Roomba 980",
-        "description": "Smart robot vacuum with powerful suction and mapping.",
-        "price": 799,
-        "rating": 4.5,
-        "stock": 30,
-        "brand": "iRobot",
-        "category": category_home,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/home_appliances/Roomba980/thumbnail.png"
-    },
-    {
-        "id": 23,
-        "title": "Samsung Smart Fridge",
-        "description": "Smart refrigerator with Family Hub and touchscreen interface.",
-        "price": 2199,
-        "rating": 4.6,
-        "stock": 12,
-        "brand": "Samsung",
-        "category": category_home,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/home_appliances/SamsungFridge/thumbnail.png"
-    },
-    {
-        "id": 24,
-        "title": "Philips Air Fryer XXL",
-        "description": "Cook with up to 90% less fat thanks to Rapid Air Technology.",
-        "price": 299,
-        "rating": 4.7,
-        "stock": 55,
-        "brand": "Philips",
-        "category": category_home,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/home_appliances/PhilipsAirFryer/thumbnail.png"
-    },
-    {
-        "id": 25,
-        "title": "KitchenAid Stand Mixer",
-        "description": "Iconic stand mixer with powerful performance for baking.",
-        "price": 429,
-        "rating": 4.8,
-        "stock": 80,
-        "brand": "KitchenAid",
-        "category": category_home,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/home_appliances/KitchenAidMixer/thumbnail.png"
-    },
-    {
-        "id": 26,
-        "title": "Sony WF-1000XM4",
-        "description": "Industry-leading noise canceling wireless earbuds.",
-        "price": 279,
-        "rating": 4.5,
-        "stock": 42,
-        "brand": "Sony",
-        "category": category_headphones,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/headphones/SonyWF1000XM4/thumbnail.png"
-    },
-    {
-        "id": 27,
-        "title": "Beats Studio Buds",
-        "description": "True wireless noise cancelling earbuds.",
-        "price": 149,
-        "rating": 4.3,
-        "stock": 70,
-        "brand": "Beats",
-        "category": category_headphones,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/headphones/BeatsBuds/thumbnail.png"
-    },
-    {
-        "id": 28,
-        "title": "Corsair K95 RGB Platinum",
-        "description": "High-performance gaming keyboard with dynamic RGB lighting.",
-        "price": 199,
-        "rating": 4.6,
-        "stock": 60,
-        "brand": "Corsair",
-        "category": category_gaming,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/gaming/K95RGB/thumbnail.png"
-    },
-    {
-        "id": 29,
-        "title": "Alienware Aurora R13",
-        "description": "High-end gaming desktop with powerful performance.",
-        "price": 2299,
-        "rating": 4.7,
-        "stock": 20,
-        "brand": "Alienware",
-        "category": category_gaming,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/gaming/AuroraR13/thumbnail.png"
-    },
-    {
-        "id": 30,
-        "title": "TP-Link Smart Plug",
-        "description": "Control your devices remotely with this smart home plug.",
-        "price": 24.99,
-        "rating": 4.4,
-        "stock": 100,
-        "brand": "TP-Link",
-        "category": category_home,
-        "thumbnail": "https://cdn.dummyjson.com/products/images/home_appliances/TPSmartPlug/thumbnail.png"
-    },
-]
-
-
-
-
-from auctions.models import Category, Auction
-from users.models import CustomUser
-from django.utils import timezone
-from datetime import timedelta
-
-user = CustomUser.objects.get(username='sofia2')
-
-groceries = Category.objects.get(name='groceries')
-furniture = Category.objects.get(name='furniture')
-fragrances = Category.objects.get(name='fragrances')
-beauty = Category.objects.get(name='beauty')
+groceries = Category.objects.get_or_create(name='groceries')[0]
+furniture = Category.objects.get_or_create(name='furniture')[0]
+fragrances = Category.objects.get_or_create(name='fragrances')[0]
 
 
 new_data = [
@@ -754,7 +519,7 @@ new_data = [
 # Guardar en la base de datos
 for item in new_data:
     auction = Auction(
-        id=item["id"],
+        id=item["id"]+10,
         title=item["title"],
         description=item["description"],
         price=item["price"],
@@ -764,6 +529,6 @@ for item in new_data:
         category=item["category"],
         thumbnail=item["thumbnail"],
         closing_date=timezone.now() + timedelta(days=30),
-        auctioneer=user
+        auctioneer=user3
     )
     auction.save()

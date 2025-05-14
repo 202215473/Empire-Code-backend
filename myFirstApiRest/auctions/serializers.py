@@ -101,12 +101,19 @@ class BidDetailSerializer(serializers.ModelSerializer):
 
 class CommentListCreateSerializer(serializers.ModelSerializer):
     creation_date = serializers.DateTimeField(format="%Y-%m%dT%H:%M:%SZ", read_only=True)  # Porque creation_date no se debería poder modificar
-    last_modified = serializers.DateTimeField(format="%Y-%m%dT%H:%M:%SZ")
+    last_modified = serializers.DateTimeField(format="%Y-%m%dT%H:%M:%SZ", read_only=True)
     class Meta:
         model = Comment
         fields = '__all__'
+        read_only_fields = ['auction', 'user', 'creation_date', 'last_modified']
+    
+    def create(self, validated_data):
+        return Comment.objects.create(**validated_data)
 
 class CommentDetailSerializer(serializers.ModelSerializer):
+    last_modified = serializers.DateTimeField(format="%Y-%m%dT%H:%M:%SZ")
+
     class Meta:
         model = Comment
         fields = '__all__'
+        read_only_fields = ['auction', 'user', 'creation_date', 'last_modified']

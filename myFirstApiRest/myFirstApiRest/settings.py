@@ -36,8 +36,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     '0.0.0.0',
-    '@dpg-cvg8f5trie7s73bn9dhg-a.oregon-postgres.render.com',
-    'empire-code-backend.onrender.com'
+    # '@dpg-cvg8f5trie7s73bn9dhg-a.oregon-postgres.render.com',
+    # 'empire-code-backend.onrender.com'
 ]
 
 
@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'rest_framework', #para importar el framework django REST al proyecto 
     'rest_framework_simplejwt', 
     'rest_framework_simplejwt.token_blacklist',
-    'drf_spectacular', #para importar la extensión drf spectacular al proyecto
+    # 'drf_spectacular', #para importar la extensión drf spectacular al proyecto
     'corsheaders',
 ]
 
@@ -95,16 +95,16 @@ WSGI_APPLICATION = 'myFirstApiRest.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-load_dotenv() 
-DATABASES = { 
-    'default': dj_database_url.config(default=os.getenv("DATABASE_URL")) 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
+# load_dotenv() 
+# DATABASES = { 
+#     'default': dj_database_url.config(default=os.getenv("DATABASE_URL")) 
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

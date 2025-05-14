@@ -10,8 +10,9 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from .models import Category, Auction, Bid, Comment
+from users.models import CustomUser
 from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer , BidListCreateSerializer, BidDetailSerializer, CommentListCreateSerializer, CommentDetailSerializer
-from .permissions import IsOwnerOrAdmin, IsNotAuctionOwner
+from .permissions import IsOwnerOrAdmin, IsNotAuctionOwner, IsCommentOwnerOrAdmin
 
 class CategoryListCreate(generics.ListCreateAPIView): 
     permission_classes = [AllowAny]
@@ -122,12 +123,33 @@ class UserBidListView(APIView):
 class CommentListCreate(generics.ListCreateAPIView): 
     def get_permissions(self):
         if self.request.method == 'POST':
-            return [IsAuthenticated]
-        return [AllowAny]
-    queryset = Comment.objects.all()
+            return [IsAuthenticated()]
+        return [AllowAny()]
+    # queryset = Comment.objects.all()
     serializer_class = CommentListCreateSerializer
 
+    def get_queryset(self):
+        auction_id = self.kwargs["auction_id"]
+        # print(self.kwargs)
+        # username = self.kwargs["username"]
+        auction = Auction.objects.get(id=auction_id)
+        # user = CustomUser.objects.get(username=username)
+        return Comment.objects.filter(auction=auction)
+
+    def perform_create(self, serializer):
+        from django.shortcuts import get_object_or_404  
+        auction = get_object_or_404(Auction, id=self.kwargs["auction_id"])
+        serializer.save(user=self.request.user, auction=auction)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            print("❌ Serializer errors:", serializer.errors)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return super().create(request, *args, **kwargs)
+    
+
 class CommentRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView): 
-    permission_classes = [IsOwnerOrAdmin]
+    permission_classes = [IsCommentOwnerOrAdmin]
     queryset = Comment.objects.all() 
     serializer_class = CommentDetailSerializer
