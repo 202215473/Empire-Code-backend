@@ -10,6 +10,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.pagination import PageNumberPagination
 
 from .models import Category, Auction, Bid, Rating
 from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer , BidListCreateSerializer, BidDetailSerializer, RatingListCreateSerializer, RatingDetailSerializer
@@ -39,12 +40,7 @@ class AuctionListCreate(generics.ListCreateAPIView):
         params = self.request.query_params 
 
         search = params.get('text', None) 
-        if search: 
-            """if len(search) < 3:
-                raise ValidationError( 
-                    {"search": "La búsqueda debe tener al menos 3 caracteres."}, 
-                    code=status.HTTP_400_BAD_REQUEST 
-                )"""
+        if search:
             queryset = queryset.filter(Q(title__icontains=search) | Q(description__icontains=search)) 
         
         category = params.get('category', None)
@@ -131,12 +127,57 @@ class BidRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     
 class UserAuctionListView(APIView): 
     permission_classes = [IsAuthenticated]
-    
-    def get(self, request, *args, **kwargs): 
-        # Obtener las subastas del usuario autenticado 
-        user_auctions = Auction.objects.filter(auctioneer=request.user) 
-        serializer = AuctionListCreateSerializer(user_auctions, many=True) 
-        return Response(serializer.data) 
+
+    def get(self, request):
+        user_auctions = Auction.objects.filter(auctioneer=request.user)
+        
+        params = request.query_params 
+
+        search = params.get('text', None) 
+        if search:
+            user_auctions = user_auctions.filter(Q(title__icontains=search) | Q(description__icontains=search)) 
+        
+        category = params.get('category', None)
+        if category:
+            if len(category) == 1:
+                user_auctions = user_auctions.filter(Q(category__id__icontains=category))
+            else:
+                category_list = category.split(',')
+                user_auctions = user_auctions.filter(category__id__in=category_list)
+
+        show_open = params.get('showOpen', None)
+        if show_open:
+            user_auctions = user_auctions.annotate(
+                is_open=Case(
+                    When(closing_date__gt=now(), then=Value(True)),
+                    default=Value(False),
+                    output_field=BooleanField()
+                )
+            )
+            user_auctions = user_auctions.filter(is_open=True)
+
+        price_min = params.get('priceMin', None)
+        if price_min:
+            user_auctions = user_auctions.filter(price__gte=price_min)
+
+        price_max = params.get('priceMax', None)
+        if price_max:
+            user_auctions = user_auctions.filter(price__lte=price_max)
+
+        user_auctions = user_auctions.annotate(average_rating=Coalesce(Avg('ratings__rating'), 1.0))
+
+        rating_min = params.get('ratingMin', None)
+        if rating_min:
+            user_auctions = user_auctions.filter(average_rating__gte=rating_min)
+
+        rating_max = params.get('ratingMax', None)
+        if rating_max:
+            user_auctions = user_auctions.filter(average_rating__lte=rating_max)
+        
+        paginator = PageNumberPagination()
+        page = paginator.paginate_queryset(user_auctions, request)
+        serializer = AuctionListCreateSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
 class UserBidListView(APIView): 
     permission_classes = [IsAuthenticated] 
@@ -159,12 +200,6 @@ class RatingListCreate(generics.ListCreateAPIView):
     def get_queryset(self):
         auction_id = self.kwargs["auction_id"]
         return super().get_queryset().filter(auction_id=auction_id)
-    
-    """def get_serializer_context(self):
-        context = super().get_serializer_context()
-        auction_id = self.kwargs["auction_id"]
-        context["auction"] = Auction.objects.get(id=auction_id)
-        return context"""
     
     def perform_create(self, serializer):
         auction = Auction.objects.get(id=self.kwargs["auction_id"])
