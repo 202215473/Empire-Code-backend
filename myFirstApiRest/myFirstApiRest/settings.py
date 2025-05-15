@@ -33,7 +33,10 @@ SECRET_KEY = 'django-insecure-2f7u)be-qwhok%0pc1)misghllj_bj-&=@y($zazur2krmk8tc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-CORS_ALLOW_ALL_ORIGINS = True 
+# CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOWED_ORIGINS = [
+    "https://empire-code-project.vercel.app",
+]
 CORS_ALLOW_CREDENTIALS = True
 
 ALLOWED_HOSTS = [
