@@ -33,19 +33,18 @@ SECRET_KEY = 'django-insecure-2f7u)be-qwhok%0pc1)misghllj_bj-&=@y($zazur2krmk8tc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "https://empire-code-project.vercel.app",
 ]
-CORS_ALLOW_CREDENTIALS = True
-
 ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     '0.0.0.0',
     # Lo de abajo es para desplegar en Render
     '@dpg-cvg8f5trie7s73bn9dhg-a.oregon-postgres.render.com',
-    'empire-code-backend-project.onrender.com'
+    'empire-code-backend.onrender.com'
 ]
 
 
