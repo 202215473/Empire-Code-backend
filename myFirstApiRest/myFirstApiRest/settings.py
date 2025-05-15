@@ -42,7 +42,7 @@ ALLOWED_HOSTS = [
     '0.0.0.0',
     # Lo de abajo es para desplegar en Render
     '@dpg-cvg8f5trie7s73bn9dhg-a.oregon-postgres.render.com',
-    # 'empire-code-backend.onrender.com'
+    'empire-code-backend.onrender.com'
 ]
 
 
