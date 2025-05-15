@@ -10,9 +10,13 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+
+# Librerías para despliegue en Render
 import os 
 import dj_database_url 
 from dotenv import load_dotenv 
+
+# Otras librerías
 from pathlib import Path
 from datetime import timedelta
 
@@ -36,6 +40,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'localhost',
     '0.0.0.0',
+    # Lo de abajo es para desplegar en Render
     '@dpg-cvg8f5trie7s73bn9dhg-a.oregon-postgres.render.com',
     'empire-code-backend.onrender.com'
 ]
@@ -95,12 +100,15 @@ WSGI_APPLICATION = 'myFirstApiRest.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# EJECUTAR EN LOCAL
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+# DESPLIEGUE RENDER
 load_dotenv() 
 DATABASES = { 
     'default': dj_database_url.config(default=os.getenv("DATABASE_URL")) 

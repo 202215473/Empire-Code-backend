@@ -15,8 +15,7 @@ class Category(models.Model):
 class Auction(models.Model): 
     title = models.CharField(max_length=150) 
     description = models.TextField() 
-    price = models.IntegerField(validators=[MinValueValidator(1)]) 
-    rating = models.DecimalField(max_digits=3, decimal_places=2, validators=[MinValueValidator(Decimal('1.00')), MaxValueValidator(Decimal('5.00'))]) 
+    price = models.IntegerField(validators=[MinValueValidator(1)])
     brand = models.CharField(max_length=100) 
     category = models.ForeignKey(Category, related_name='auctions', on_delete=models.CASCADE)
     thumbnail = models.URLField()
@@ -49,3 +48,28 @@ class Bid(models.Model):
  
     def __str__(self): 
         return f"Bid of auction {self.auction} for {self.bid}$"
+    
+class Rating(models.Model):
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    user = models.ForeignKey(CustomUser, related_name='ratings', on_delete=models.CASCADE) 
+    auction = models.ForeignKey(Auction, related_name='ratings', on_delete=models.CASCADE)
+    
+    class Meta:  
+        ordering=('auction', 'rating')  # id compuesto
+
+    def __str__(self): 
+        return f"Rating of auction {self.auction} of {self.rating} by {self.user}"
+
+class Comment(models.Model):
+    auction = models.ForeignKey(Auction, related_name="comments", on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, related_name="comments", on_delete=models.CASCADE)
+    title = models.CharField(max_length=150)
+    text = models.TextField(blank=True)
+    creation_date = models.DateTimeField(auto_now_add=True)  # auto_now_add edits the field ONLY the first time i use it
+    last_modified = models.DateTimeField(auto_now=True)  # auto_now updates every time we save a comment
+
+    class Meta:
+        ordering=('auction', 'user', 'creation_date')
+    
+    def __str__(self):
+        return f"Comment for auction {self.auction} with id {self.id}"
