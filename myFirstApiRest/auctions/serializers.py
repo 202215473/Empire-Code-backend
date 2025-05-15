@@ -117,24 +117,14 @@ class RatingListCreateSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Rating 
         fields = '__all__' 
-        # read_only_fields = ['user', 'auction']
-
-    """def create(self, validated_data):
-        user = self.context['request'].user
-        auction = self.context['auction']
-
-        if Rating.objects.filter(user=user, auction=auction).exists():
-            raise serializers.ValidationError("You have already rated this auction.")
-        else:
-            return super().create(validated_data)"""
+        read_only_fields = ['id', 'user', 'auction']
     
 
 class RatingDetailSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Rating 
         fields = '__all__' 
-        # read_only_fields = ['user', 'auction']
-
+        read_only_fields = ['id', 'user', 'auction']
 
 class CommentListCreateSerializer(serializers.ModelSerializer):
     creation_date = serializers.DateTimeField(format="%Y-%m%dT%H:%M:%SZ", read_only=True)  # Porque creation_date no se debería poder modificar
