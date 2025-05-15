@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response 
 from rest_framework_simplejwt.tokens import RefreshToken 
 from .models import CustomUser 
-from .serializers import UserSerializer, ChangePasswordSerializer 
+from .serializers import UserSerializer, ChangePasswordSerializer, MinimalUserSerializer
 from rest_framework.exceptions import ValidationError 
 from django.contrib.auth.password_validation import validate_password 
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -98,3 +98,19 @@ class ChangePasswordView(APIView):
             return Response({"detail": "Password updated successfully."}) 
  
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+    
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = MinimalUserSerializer(request.user)
+        return Response(serializer.data)
+
+class PublicUserView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        # user_id = request.query_params.get('id')
+        user = CustomUser.objects.get(id=pk)
+        return Response({"username": user.username})
+        
