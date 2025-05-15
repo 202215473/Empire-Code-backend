@@ -1,7 +1,7 @@
 # First, create some users
 from users.models import CustomUser
-CustomUser.objects.create_superuser(username='sofia', email='sofia@gmail.com', password='StarWars3', birth_date='2000-01-01') 
-CustomUser.objects.create(username='sofia2', email='sofia2@gmail.com', password='StarWars3', birth_date='2002-09-05') 
+CustomUser.objects.create_superuser(username='sofia', email='sofia@gmail.com', password='StarWars1', birth_date='2000-01-01') 
+CustomUser.objects.create(username='sofia2', email='sofia2@gmail.com', password='StarWars2', birth_date='2002-09-05') 
 CustomUser.objects.create(username='sofia3', email='sofia3@gmail.com', password='StarWars3', birth_date='2002-09-05') 
 
 # Now we will create the database
@@ -14,8 +14,14 @@ import random
 # Get some users
 # user = CustomUser.objects.get(username='isa.morell')
 user = CustomUser.objects.get(username='sofia')
+user.is_active = True
+user.save()
 user2 = CustomUser.objects.get(username='sofia2')
+user2.is_active = True
+user2.save()
 user3 = CustomUser.objects.get(username='sofia3')
+user3.is_active = True
+user3.save()
 
 # Initialize some categories
 smartphones = Category.objects.get_or_create(name='smartphones')[0]
