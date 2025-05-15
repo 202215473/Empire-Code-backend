@@ -117,7 +117,7 @@ class RatingListCreateSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Rating 
         fields = '__all__' 
-        read_only_fields = ['user', 'auction']
+        # read_only_fields = ['user', 'auction']
 
     """def create(self, validated_data):
         user = self.context['request'].user
@@ -133,7 +133,7 @@ class RatingDetailSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Rating 
         fields = '__all__' 
-        read_only_fields = ['user', 'auction']
+        # read_only_fields = ['user', 'auction']
 
 
 class CommentListCreateSerializer(serializers.ModelSerializer):
