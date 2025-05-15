@@ -117,14 +117,17 @@ class RatingListCreateSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Rating 
         fields = '__all__' 
-        read_only_fields = ['id', 'user', 'auction']
+        read_only_fields = ['user', 'auction']
+
+    def create(self, validated_data):
+        return Rating.objects.create(**validated_data)
     
 
 class RatingDetailSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Rating 
         fields = '__all__' 
-        read_only_fields = ['id', 'user', 'auction']
+        read_only_fields = ['user', 'auction']
 
 class CommentListCreateSerializer(serializers.ModelSerializer):
     creation_date = serializers.DateTimeField(format="%Y-%m%dT%H:%M:%SZ", read_only=True)  # Porque creation_date no se debería poder modificar
