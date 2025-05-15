@@ -1,4 +1,4 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 from django.db.models import Q, Max, Avg, When, Case, Value, BooleanField
 from django.db.models.functions import Coalesce
 from django.utils.timezone import now
