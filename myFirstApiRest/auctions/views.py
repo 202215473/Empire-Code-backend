@@ -201,8 +201,9 @@ class RatingListCreate(generics.ListCreateAPIView):
         return super().get_queryset().filter(auction_id=auction_id)
     
     def perform_create(self, serializer):
+        print("auction_id", self.kwargs["auction_id"])
         auction = Auction.objects.get(id=self.kwargs["auction_id"])
-        print(auction)
+        print("auction", auction)
         user = self.request.user
 
         if Rating.objects.filter(user=user, auction=auction).exists():
