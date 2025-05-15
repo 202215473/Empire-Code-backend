@@ -71,8 +71,6 @@ MIDDLEWARE = [  # "Una capa más"
     'corsheaders.middleware.CorsMiddleware', #Añadir en primera posición 
     'django.middleware.common.CommonMiddleware', #Mover a segunda posición
     'django.middleware.security.SecurityMiddleware',
-    # Añadido para Render
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -80,11 +78,6 @@ MIDDLEWARE = [  # "Una capa más"
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-# Añadido para Render
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ROOT_URLCONF = 'myFirstApiRest.urls'
 
