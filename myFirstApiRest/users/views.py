@@ -105,3 +105,12 @@ class CurrentUserView(APIView):
     def get(self, request):
         serializer = MinimalUserSerializer(request.user)
         return Response(serializer.data)
+
+class PublicUserView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        # user_id = request.query_params.get('id')
+        user = CustomUser.objects.get(id=pk)
+        return Response({"username": user.username})
+        

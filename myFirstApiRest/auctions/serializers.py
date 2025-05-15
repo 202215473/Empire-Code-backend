@@ -154,3 +154,25 @@ class CommentDetailSerializer(serializers.ModelSerializer):
         model = Comment
         fields = '__all__'
         read_only_fields = ['auction', 'user', 'creation_date', 'last_modified']
+
+class UserCommentDetailSerializer(serializers.Serializer):
+    auction_id = serializers.IntegerField()
+    auction_title = serializers.CharField()
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    category = serializers.CharField()
+    is_open = serializers.BooleanField()
+    comment_id = serializers.IntegerField()
+    comment_title = serializers.CharField()
+    class Meta:
+        fields = '__all__'
+
+class UserRatingDetailSerializer(serializers.Serializer):
+    auction_id = serializers.IntegerField()
+    auction_title = serializers.CharField()
+    price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    category = serializers.CharField()
+    is_open = serializers.BooleanField()
+    rating_id = serializers.IntegerField()
+    rating_value = serializers.CharField()
+    class Meta:
+        fields = '__all__'

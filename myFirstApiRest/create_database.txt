@@ -1,20 +1,19 @@
 # First, create some users
 from users.models import CustomUser
-CustomUser.objects.create_superuser(username='sofia', email='sofia@gmail.com', password='StarWars3', birth_date='2000-01-01') 
-CustomUser.objects.create(username='sofia2', email='sofia2@gmail.com', password='StarWars3', birth_date='2002-09-05') 
-CustomUser.objects.create(username='sofia3', email='sofia3@gmail.com', password='StarWars3', birth_date='2002-09-05') 
+CustomUser.objects.create_superuser(username='sofia', email='sofia@gmail.com', password='Test1234!', birth_date='2002-09-05') 
+CustomUser.objects.create_superuser(username='isa.morell', email='isa.morell@gmail.com', password='Test1234!', birth_date='2000-01-01') 
 
 # Now we will create the database
 from users.models import CustomUser
-from auctions.models import Category, Auction #, Rating
+from auctions.models import Category, Auction, Rating
 from django.utils import timezone
 from datetime import timedelta
 import random
 
-# Get some users
-user = CustomUser.objects.get(username='isa.morell')
-user2 = CustomUser.objects.get(username='sofia2')
-user3 = CustomUser.objects.get(username='sofia3')
+# Get all users
+user1 = CustomUser.objects.get(username='isa.morell')
+user2 = CustomUser.objects.get(username='sofia')
+users = CustomUser.objects.all()
 
 # Initialize some categories
 smartphones = Category.objects.get_or_create(name='smartphones')[0]
@@ -432,7 +431,7 @@ data = [
     }
 ]
 
-#Para cada ejemplo, cremaos un nuevo objeto Subasta y lo guardamos en BD.
+# For each product created, we will create a new Auction object and save ir in the database
 for item in data:
     auction = Auction(
         id=item["id"],
@@ -440,23 +439,25 @@ for item in data:
         description=item["description"],
         price=item["price"],
         # Comment rating line if using the Rating model
-        rating=random.randint(1,5),
+        # rating=random.randint(1,5),
         stock=item["stock"],
         brand=item["brand"],
         category=item["category"],
         thumbnail=item["thumbnail"],
         closing_date = timezone.now() + timedelta(days=30),
-        auctioneer=random.choice([user, user2, user3])
+        auctioneer=random.choice(users)
     )
     auction.save()
 
 # If using the Rating model, initialize some ratings
 i = 0
 for auct in Auction.objects.all():
-    rating = Rating(
-        id=i,
-        rating=random.randint(1,5),
-        auction=auct,
-        user=auct.auctioneer
-    )
-    rating.save()
+    for user in users:
+        rating = Rating(
+            id=i,
+            rating=random.randint(1,5),
+            auction=auct,
+            user=user
+        )
+        rating.save()
+        i += 1
