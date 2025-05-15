@@ -232,13 +232,6 @@ class CommentListCreate(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         auction = Auction.objects.get(id=self.kwargs["auction_id"])
         serializer.save(user=self.request.user, auction=auction)
-
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     if not serializer.is_valid():
-    #         print("❌ Serializer errors:", serializer.errors)
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #     return super().create(request, *args, **kwargs)
     
 
 class CommentRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView): 
