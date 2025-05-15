@@ -111,8 +111,7 @@ WSGI_APPLICATION = 'myFirstApiRest.wsgi.application'
 # DESPLIEGUE RENDER
 load_dotenv() 
 DATABASES = { 
-    # 'default': dj_database_url.config(default=os.getenv("DATABASE_URL")) 
-    'default': dj_database_url.parse(env("DATABASE_URL")) 
+    'default': dj_database_url.config(default=os.getenv("DATABASE_URL")) 
 }
 
 # Password validation
