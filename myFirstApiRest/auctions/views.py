@@ -63,6 +63,17 @@ class AuctionListCreate(generics.ListCreateAPIView):
                 )
             )
             queryset = queryset.filter(is_open=True)
+        
+        last_call = params.get('lastCall', None)
+        if last_call:
+            # queryset = queryset.annotate(
+            #     last_call=Case(
+            #         When(closing_date__gt=now(), then=Value(True)),
+            #         default=Value(False),
+            #         output_field=BooleanField()
+            #     )
+            # )
+            queryset = queryset.filter(last_call=True)
 
         price_min = params.get('priceMin', None)
         if price_min:

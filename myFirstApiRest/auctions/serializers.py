@@ -20,7 +20,8 @@ class AuctionListCreateSerializer(serializers.ModelSerializer):
     creation_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ", read_only=True) 
     closing_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ") 
     isOpen = serializers.SerializerMethodField(read_only=True) 
-    rating = serializers.SerializerMethodField(read_only=True) 
+    rating = serializers.SerializerMethodField(read_only=True)
+    last_call = serializers.SerializerMethodField(read_only=True)
 
     class Meta: 
         model = Auction 
@@ -39,17 +40,27 @@ class AuctionListCreateSerializer(serializers.ModelSerializer):
     def get_rating(self, obj): 
         rating = obj.ratings.aggregate(avg_rating=Avg('rating'))['avg_rating']
         return round(rating, 2) if rating else 1.0
-    
-    def validate_closing_date(self, value): 
-        if value < timezone.now() + timedelta(days=15): 
-            raise serializers.ValidationError("La fecha de cierre debe ser al menos 15 días después de la fecha de creación") 
-        return value 
+
+    @extend_schema_field(serializers.BooleanField())
+    def get_last_call(self, obj):
+        cond1 = (obj.closing_date.day > timezone.now().day - 1) and ((obj.closing_date.hour > timezone.now().hour))
+        try:
+            cond2 = Bid.objects.get(auction=obj.id)
+        except Bid.DoesNotExist:
+            cond2 = False
+        return cond1 and not cond2
+
+    # def validate_closing_date(self, value): 
+    #     if value < timezone.now() + timedelta(days=15): 
+    #         raise serializers.ValidationError("La fecha de cierre debe ser al menos 15 días después de la fecha de creación") 
+    #     return value 
      
 class AuctionDetailSerializer(serializers.ModelSerializer): 
     creation_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ", read_only=True)  # Porque creation_date no se debería poder modificar
     closing_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ") 
     isOpen = serializers.SerializerMethodField(read_only=True)  # Para evaluar si auction está abierta o no (es como un estado en react, pero aquí es más sencillo)
     rating = serializers.SerializerMethodField(read_only=True) 
+    last_call = serializers.SerializerMethodField(read_only=True)
 
     class Meta: 
         model = Auction 
@@ -65,11 +76,20 @@ class AuctionDetailSerializer(serializers.ModelSerializer):
         rating = obj.ratings.aggregate(avg_rating=Avg('rating'))['avg_rating']
         return round(rating, 2) if rating else 1.0
 
-    def validate_closing_date(self, value): 
-        creation_date = self.instance.creation_date
-        if value < creation_date + timedelta(days=15): 
-            raise serializers.ValidationError("La fecha de cierre debe ser al menos 15 días después de la fecha de creación") 
-        return value 
+    @extend_schema_field(serializers.BooleanField())
+    def get_last_call(self, obj):
+        cond1 = (obj.closing_date.day > timezone.now().day - 1) and ((obj.closing_date.hour > timezone.now().hour))
+        try:
+            cond2 = Bid.objects.get(auction=obj.id)
+        except Bid.DoesNotExist:
+            cond2 = False
+        return cond1 and not cond2
+
+    # def validate_closing_date(self, value): 
+    #     creation_date = self.instance.creation_date
+    #     if value < creation_date + timedelta(days=15): 
+    #         raise serializers.ValidationError("La fecha de cierre debe ser al menos 15 días después de la fecha de creación") 
+    #     return value 
     
 class BidListCreateSerializer(serializers.ModelSerializer): 
     class Meta: 
